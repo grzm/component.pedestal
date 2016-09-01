@@ -8,6 +8,25 @@ through the Pedestal context.
 Pedestal Component also provides test helpers for starting and stopping the
 system.
 
+## Releases and Dependency Information
+
+Releases are on [Clojars](https://clojars.org/grzm/component.pedestal).
+
+[Leiningen] dependency information:
+
+    [grzm/component.pedestal "0.0.1-SNAPSHOT"]
+
+[Maven] dependency information:
+
+    <dependency>
+      <groupId>grzm</groupId>
+      <artifactId>component.pedestal</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+
+[Leiningen]: http://leiningen.org/
+[Maven]: http://maven.apache.org/
+
 ## Usage
 
 ```clojure
