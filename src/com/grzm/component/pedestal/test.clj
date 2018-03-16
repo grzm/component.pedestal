@@ -1,6 +1,6 @@
-(ns grzm.component.pedestal.test
+(ns com.grzm.component.pedestal.test
   (:require [com.stuartsierra.component :as component]
-            [grzm.component.pedestal :as cp]
+            [com.grzm.component.pedestal :as cp]
             [io.pedestal.http :as http]
             [io.pedestal.test :as test]
             [io.pedestal.interceptor :refer [interceptor]]

@@ -1,4 +1,4 @@
-(ns grzm.component.pedestal
+(ns com.grzm.component.pedestal
   "Connection between the Component framework and the Pedestal web
   application server."
   (:require [com.stuartsierra.component :as component]

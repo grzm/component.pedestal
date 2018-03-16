@@ -10,28 +10,40 @@ system.
 
 ## Releases and Dependency Information
 
-Releases are on [Clojars](https://clojars.org/grzm/component.pedestal).
+Releases are on [Clojars](https://clojars.org/com.grzm/component.pedestal).
 
-[Leiningen] dependency information:
+### Clojure [CLI/deps.edn][deps] coordinates:
 
-    [grzm/component.pedestal "0.0.1-SNAPSHOT"]
+```clojure
+{com.grzm/component.pedestal {:mvn/version "0.0.3-SNAPSHOT"}}
+```
 
-[Maven] dependency information:
+### [Leiningen][]/[Boot][] dependency information:
 
-    <dependency>
-      <groupId>grzm</groupId>
-      <artifactId>component.pedestal</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
+```clojure
+[com.grzm/component.pedestal "0.0.3-SNAPSHOT"]
+```
 
+### [Maven] dependency information:
+
+```xml
+<dependency>
+  <groupId>com.grzm</groupId>
+  <artifactId>component.pedestal</artifactId>
+  <version>0.0.3-SNAPSHOT</version>
+</dependency>
+```
+
+[deps]: https://clojure.org/reference/deps_and_cli
 [Leiningen]: http://leiningen.org/
+[Boot]: http://boot-clj.com
 [Maven]: http://maven.apache.org/
 
 ## Usage
 
 ```clojure
 (ns com.example.myapp
-  (:require [grzm.component.pedestal :as cp]))
+  (:require [com.grzm.component.pedestal :as cp]))
 ```
 
 Pedestal Component provides a constructor that takes a single
@@ -57,7 +69,7 @@ There are two helper functions for managing components within Pedestal.
             [io.pedestal.http.route :as route]
             [ring.util.response :as ring-resp]
             [com.stuartsierra.component :as component]
-            [grzm.component.pedestal :as cp]
+            [com.grzm.component.pedestal :as cp]
             [com.example.myapp.component.application :as app]
             [com.example.myapp.component.database :as db]))
 
@@ -106,7 +118,7 @@ There are two helper functions for managing components within Pedestal.
 
 ```clojure
 (ns com.example.yourapp.test
-  (:require [grzm.component.pedestal.test :as cpt]))
+  (:require [com.grzm.component.pedestal.test :as cpt]))
 ```
 
 There are two functions and a macro that are useful for testing:
@@ -131,8 +143,8 @@ Pedestal component used in production.
 (ns com.example.myapp.handler-test
    (:require [clojure.test :refer :all]
              [io.pedestal.test :refer :all]
-             [grzm.component.pedestal.test :as cpt]
-             [grzm.component.pedestal :as cp]
+             [com.grzm.component.pedestal.test :as cpt]
+             [com.grzm.component.pedestal :as cp]
              [com.example.myapp.component.application :as app]
              [com.example.myapp.component.database :as db]             
              [peridot.core :as p]))
@@ -197,10 +209,21 @@ code to wrap Pedestal service-fn in a Ring handler. Great stuff!
 
 The MIT License (MIT)
 
-Copyright © 2016 Michael Glaesemann
+© 2016–2018 Michael Glaesemann
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

@@ -1,4 +1,4 @@
-(defproject grzm/component.pedestal "0.0.1-SNAPSHOT"
+(defproject com.grzm/component.pedestal "0.0.3-SNAPSHOT"
   :description "Pedestal service wrapper for Component systems"
   :url "https://github.com/grzm/component.pedestal"
   :license {:name "The MIT License"
