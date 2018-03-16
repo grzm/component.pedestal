@@ -126,3 +126,10 @@
                        :request request}))
       component)))
 
+(def strip-component
+  "Interceptor to remove the pedestal component"
+  (interceptor
+    {:leave (fn [context]
+              (-> context
+                  (update-in [:request] #(dissoc % component-key))
+                  (dissoc pedestal-component-key)))}))
