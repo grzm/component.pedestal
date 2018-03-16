@@ -13,7 +13,7 @@
   "Returns an interceptor which associates key with value in the
    Pedestal context map."
   [key value]
-  (interceptor {:name ::insert-context
+  (interceptor {:name  ::insert-context
                 :enter (fn [context] (assoc context key value))}))
 
 (defn add-component-interceptor
@@ -77,12 +77,12 @@
     (when (nil? pedestal)
       (throw (ex-info (str "Pedestal component was nil in the context map; "
                            "component.pedestal is not configured correctly")
-                      {:reason ::nil-pedestal
+                      {:reason  ::nil-pedestal
                        :context context})))
     (when (= ::not-found pedestal)
       (throw (ex-info (str "Pedestal component was missing from context map; "
                            "component.pedestal is not configured correctly")
-                      {:reason ::missing-pedestal
+                      {:reason  ::missing-pedestal
                        :context context})))
     pedestal))
 
@@ -94,9 +94,9 @@
     (when (nil? component)
       (throw (ex-info (str "Component " key " was nil in the Pedestal dependencies; "
                            "maybe it returned nil from start or stop")
-                      {:reason ::nil-component
+                      {:reason         ::nil-component
                        :dependency-key key
-                       :context context})))
+                       :context        context})))
     component))
 
 (defn using-component
@@ -109,7 +109,7 @@
    get :component from the request map."
   [key]
   (interceptor
-    {:name ::using-component
+    {:name  ::using-component
      :enter (fn [context]
               (assoc-in context [:request component-key key]
                         (get-component context key)))}))
@@ -121,9 +121,9 @@
     (if (nil? component)
       (throw (ex-info (str "Component " key " was nil in the request map; "
                            "key must be declared as a depedency via `using-component`")
-                      {:reason ::nil-component
+                      {:reason         ::nil-component
                        :dependency-key key
-                       :request request}))
+                       :request        request}))
       component)))
 
 (def strip-component
