@@ -32,6 +32,18 @@
         (list 'try (cons 'do body)
               (list 'finally (list `stop system-var)))))
 
+(defmacro with-system-options
+  "Wraps a test body and handles starting and stopping the system for the
+   test. Wraps the test body in a try-finally block to ensure the system
+   stops cleanly, isolating the test and allowing other tests to run."
+  [system-var init-fn teardown-fn & body]
+  (list 'do
+        (list `go system-var init-fn)
+        (list 'try (cons 'do body)
+              (list 'finally
+                    (list `stop system-var)
+                    (list teardown-fn)))))
+
 (defn service
   "Returns the service function (:io.pedestal.http/service-fn) from a system.
    Accepts an optional second argument for the keyword used to identify the
