@@ -15,13 +15,13 @@ Releases are on [Clojars](https://clojars.org/com.grzm/component.pedestal).
 ### Clojure [CLI/deps.edn][deps] coordinates:
 
 ```clojure
-{com.grzm/component.pedestal {:mvn/version "0.0.3-SNAPSHOT"}}
+{com.grzm/component.pedestal {:mvn/version "0.1.7"}}
 ```
 
 ### [Leiningen][]/[Boot][] dependency information:
 
 ```clojure
-[com.grzm/component.pedestal "0.0.3-SNAPSHOT"]
+[com.grzm/component.pedestal "0.1.7"]
 ```
 
 ### [Maven] dependency information:
@@ -30,7 +30,7 @@ Releases are on [Clojars](https://clojars.org/com.grzm/component.pedestal).
 <dependency>
   <groupId>com.grzm</groupId>
   <artifactId>component.pedestal</artifactId>
-  <version>0.0.3-SNAPSHOT</version>
+  <version>0.1.7</version>
 </dependency>
 ```
 
@@ -38,6 +38,8 @@ Releases are on [Clojars](https://clojars.org/com.grzm/component.pedestal).
 [Leiningen]: http://leiningen.org/
 [Boot]: http://boot-clj.com
 [Maven]: http://maven.apache.org/
+
+Please see [breaking changes](/changes.markdown#0.1.7) in 0.1.7.
 
 ## Usage
 
