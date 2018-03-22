@@ -118,7 +118,7 @@ There are two helper functions for managing components within Pedestal.
 
 ```clojure
 (ns com.example.yourapp.test
-  (:require [com.grzm.component.pedestal.test :as cpt]))
+  (:require [com.grzm.component.pedestal.test.alpha :as cpt]))
 ```
 
 There are two functions and a macro that are useful for testing:
@@ -143,7 +143,7 @@ Pedestal component used in production.
 (ns com.example.myapp.handler-test
    (:require [clojure.test :refer :all]
              [io.pedestal.test :refer :all]
-             [com.grzm.component.pedestal.test :as cpt]
+             [com.grzm.component.pedestal.test.alpha :as cpt]
              [com.grzm.component.pedestal :as cp]
              [com.example.myapp.component.application :as app]
              [com.example.myapp.component.database :as db]             

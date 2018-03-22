@@ -1,13 +1,18 @@
-(ns com.grzm.component.pedestal.test
-  (:require [com.stuartsierra.component :as component]
-            [com.grzm.component.pedestal :as cp]
-            [io.pedestal.http :as http]
-            [io.pedestal.test :as test]
-            [io.pedestal.interceptor :refer [interceptor]]
-            [io.pedestal.http.csrf :as csrf]
-            [io.pedestal.log :as log]
-            [clojure.edn :as edn]
-            [ring.mock.request :as mock-request]))
+(ns com.grzm.component.pedestal.test.alpha
+  (:require
+   [com.stuartsierra.component :as component]
+   [com.grzm.component.pedestal :as cp]
+   [io.pedestal.http :as http]
+   [io.pedestal.http.impl.servlet-interceptor :as servlet-interceptor]
+   [io.pedestal.test :as test]
+   [io.pedestal.interceptor :refer [interceptor]]
+   [io.pedestal.http.csrf :as csrf]
+   [io.pedestal.log :as log]
+   [clojure.edn :as edn]
+   [ring.mock.request :as mock-request]))
+
+(def csrf-token-header-key "X-TEST-HELPER-CSRF")
+(def default-pedestal-key :pedestal)
 
 (defn- init [system-var init-fn]
   (alter-var-root system-var (init-fn)))
@@ -49,7 +54,7 @@
    Accepts an optional second argument for the keyword used to identify the
    Pedestal component in the system. Otherwise assumes the keyword is :pedestal."
   ([system]
-   (service system :pedestal))
+   (service system default-pedestal-key))
   ([system pedestal-key]
    (get-in system [pedestal-key :server ::http/service-fn])))
 
@@ -66,14 +71,15 @@
 ;; Expose request CSRF tokens in the response header
 (def csrf-token-in-response-header
   (interceptor
-    {:name ::csrf-token-in-response-header
+    {:name  ::csrf-token-in-response-header
      :leave (fn [context]
-              (assoc-in context [:response :headers "X-TEST-HELPER-CSRF"]
-                        (or (get-in context [:request ::csrf/anti-forgery-token])
-                            (get-in context [:request :session "__anti-forgery-token"]))))}))
+              (if-let [token (or (get-in context [:request csrf/anti-forgery-token])
+                                 (get-in context [:request :session csrf/anti-forgery-token-str]))]
+                (assoc-in context [:response :headers csrf-token-header-key] token)
+                context))}))
 
-(defn surface-csrf-token [system]
-  (update-in system [::cp/pedestal :server ::http/interceptors]
+(defn surface-csrf-token [system pedestal-key]
+  (update-in system [pedestal-key :server ::http/interceptors]
              conj csrf-token-in-response-header))
 
 (defn ring-handler
@@ -81,22 +87,24 @@
    Accepts an optional second argument for the keyword used to identify the
    Pedestal component in the system. Otherwise assumes the keyword is :pedestal."
   ([system]
-   (ring-handler system :pedestal))
+   (ring-handler system default-pedestal-key))
   ([system pedestal-key]
-   (let [service-fn (-> system
-                        surface-csrf-token
-                        (service pedestal-key))]
+   ;; Create a new service-fn adding the csrf-token-in-response-header interceptor.
+   (let [service-fn (-> (surface-csrf-token system pedestal-key)
+                        (get-in [pedestal-key :server ::http/interceptors])
+                        servlet-interceptor/http-interceptor-service-fn)]
      (fn [{:keys [request-method uri headers body] :as request}]
-       (let [options (cond-> []
-                       body (into [:body (slurp body)])
-                       ;; fix capitalization and filter headers
-                       headers (into [:headers
-                                      (zipmap
-                                        (map #(get
-                                                {"content-type" "Content-Type"
-                                                 "accept" "Accept"} % %)
-                                             (keys headers))
-                                        (vals headers))]))
+       (let [options  (cond-> []
+                        body    (into [:body (slurp body)])
+                        ;; fix capitalization and filter headers
+                        headers (into [:headers
+                                       (zipmap
+                                         (map #(get
+                                                 {"content-type" "Content-Type"
+                                                  "accept"       "Accept"} % %)
+                                              (keys headers))
+                                         (vals headers))]))
+             ;; Use the new service-fn to process response.
              response (apply test/response-for service-fn request-method uri options)]
          (cond-> response
            (.startsWith ^String (get-in response [:headers "Content-Type"] "")

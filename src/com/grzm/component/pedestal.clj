@@ -1,10 +1,11 @@
 (ns com.grzm.component.pedestal
   "Connection between the Component framework and the Pedestal web
   application server."
-  (:require [com.stuartsierra.component :as component]
-            [io.pedestal.http :as http]
-            [io.pedestal.log :as log]
-            [io.pedestal.interceptor :refer [interceptor]]))
+  (:require
+   [com.stuartsierra.component :as component]
+   [io.pedestal.http :as http]
+   [io.pedestal.log :as log]
+   [io.pedestal.interceptor :refer [interceptor]]))
 
 (def pedestal-component-key ::pedestal-component)
 (def component-key ::component)
