@@ -48,20 +48,36 @@ Please see [breaking changes](/changes.markdown#0.1.7) in 0.1.7.
   (:require [com.grzm.component.pedestal :as cp]))
 ```
 
+ * Define all the components which you intend to use from Pedestal into a fixed vector: `(def components-to-inject [:db :sms :worker])`
+
 Pedestal Component provides a constructor that takes a single
 0-arity function which returns the Pedestal configuration service map.
 The service map is passed to `io.pedestal.http/create-server`.
 
+ * Use said constructor, along with `components-to-inject` as dependencies:
+
 ```clojure
-(cp/pedestal config-fn) ;; => cp/Pedestal record
+(component/using (cp/pedestal config-fn) components-to-inject) ;; => cp/Pedestal record
 ```
 
-There are two helper functions for managing components within Pedestal.
+For injecting components from your system into the Pedestal request map:
 
- * `(cp/using-component :component-key)` is returns an interceptor which adds a
+ * Build and define an interceptor chain which will inject those components: `(def component-interceptors (cp/component-interceptors components-to-inject))`
+
+ * Then, you can prepend said chain into your routes: ``["/api" :get (into component-interceptors [http/json-body `my-handler])]``
+
+ * Now, you can get your components from the request map directly: `(defn my-handler [{:keys [db sms] :as request}] ...)`
+
+ * Optionally, you can use namespace-qualified keys instead of plain `:db`, etc.
+
+## Legacy API
+
+ * `(cp/using-component :component-key)` returns an interceptor which adds a
    component to the Pedestal context, making it available via the request map.
  * `(cp/use-component request :component-key)` returns the component from the
    request map.
+
+## Complete example
 
 ```clojure
 (ns com.example.myapp.server
@@ -79,20 +95,21 @@ There are two helper functions for managing components within Pedestal.
   (ring-resp/response "Welcome!"))
 
 (defn login-page
-  [{:keys [form-params] :as request}]
-  (let [app (cp/use-component request :app)
-        {:keys [username password]} form-params]
+  [{:keys [form-params app db] :as request}]
+  ;; now you can do something with `app` or `db`...
+  (let [{:keys [username password]} form-params]
     (if-let [user (app/user-by-creds {:username username :password password})]
       (ring-resp/response (str "Welcome, " (:user/first-name user) "!"))
       (ring-resp/redirect (route/url-for :home-page)))))
 
-(def routes #{["/" :get [(body-params)
-                         `home-page]]
-              ["/login" :post [(body-params)
-                               (cp/using-component :app)
-                               `login-page]]})
+(def components-to-inject [:db])
 
-(defn pedestal-config-fn "Return Pedestal service map" [] 
+(def component-interceptors (cp/component-interceptors components-to-inject))
+
+(def routes #{["/" :get (into component-interceptors [(body-params) `home-page])]
+              ["/login" :post (into into component-interceptors [(body-params) `login-page])]})
+
+(defn pedestal-config-fn "Return Pedestal service map" []
  ;; routes and other interesting bits
 )
 
@@ -102,9 +119,9 @@ There are two helper functions for managing components within Pedestal.
 (defn system [{:keys [pedestal db]}]
   (component/system-map
     :db (db/database (:conn-uri db))
-    :app (component/using (app/application) [:db]
+    :app (component/using (app/application) components-to-inject)
     :pedestal (component/using (cp/pedestal (:config-fn pedestal))
-                 [:app])))
+                 (conj components-to-inject :app))))
 
 (defn start-system [sys]
   (component/start sys)
@@ -113,7 +130,7 @@ There are two helper functions for managing components within Pedestal.
 
 (defn -main [& args]
   (start-system (system config)))
-  
+
 ```
 
 ## Testing

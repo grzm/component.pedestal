@@ -134,3 +134,23 @@
               (-> context
                   (update-in [:request] #(dissoc % component-key))
                   (dissoc pedestal-component-key)))}))
+
+(defn- context-injector [components]
+  {:enter (fn [{:keys [request] :as context}]
+            (reduce (fn [v component]
+                      (assoc-in v [:request component] (use-component request component)))
+                    context
+                    components))
+   :name ::context-injector})
+
+(defn component-interceptors
+  "For a given sequence of keywords representing the system components to be injected to the Pedestal context,
+  returns the necessary interceptors for you to prepend in your routes.
+
+  Each component will be associated under its given key, directly to the request map:
+
+  (:db request) -> <the :db component>"
+  [components-to-inject]
+  {:pre [(every? keyword? components-to-inject)]}
+  (conj (mapv using-component components-to-inject)
+        (context-injector components-to-inject)))
